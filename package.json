@@ -11,12 +11,8 @@
     "clean": "rimraf ./dist/ ./static/assets/",
     "compile": "rimraf ./dist/ && electron-webpack --bail --display-error-details --env.minify=false",
     "fetch": "rimraf ./static/assets/ && mkdirp ./static/assets/ && node ./scripts/fetchMediaLibraryAssets.js",
-<<<<<<< HEAD
     "dist": "npm run fetch && npm run compile -p && electron-builder",
     "dist-win": "npm run fetch && npm run compile -p && electron-builder --windows nsis:ia32",
-=======
-    "dist": "npm run build-gui && npm run fetch && npm run compile -p && electron-builder",
->>>>>>> 723e70104e45fafd512a5b46ac666d03a91c32b9
     "dist:dir": "npm run dist -- --dir -c.compression=store -c.mac.identity=null",
     "lint": "eslint --cache --color --ext .jsx,.js ."
   },
