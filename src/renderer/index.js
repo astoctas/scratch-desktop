@@ -1,49 +1,33 @@
-import {ipcRenderer, shell} from 'electron';
-import React from 'react';
+// This file does async imports of the heavy JSX, especially app.jsx, to avoid blocking the first render.
+// The main index.html just contains a loading/splash screen which will display while this import loads.
+
+import {ipcRenderer} from 'electron';
+
 import ReactDOM from 'react-dom';
-import GUI, {AppStateHOC} from 'scratch-gui';
 
-import ElectronStorageHelper from '../common/ElectronStorageHelper';
+ipcRenderer.on('ready-to-show', () => {
+    // Start without any element in focus, otherwise the first link starts with focus and shows an orange box.
+    // We shouldn't disable that box or the focus behavior in case someone wants or needs to navigate that way.
+    // This seems like a hack... maybe there's some better way to do avoid any element starting with focus?
+    document.activeElement.blur();
+});
 
-import styles from './app.css';
+const route = new URLSearchParams(window.location.search).get('route') || 'app';
+let routeModulePromise;
+switch (route) {
+case 'app':
+    routeModulePromise = import('./app.jsx');
+    break;
+case 'about':
+    routeModulePromise = import('./about.jsx');
+    break;
+case 'privacy':
+    routeModulePromise = import('./privacy.jsx');
+    break;
+}
 
-const defaultProjectId = 0;
-
-// override window.open so that it uses the OS's default browser, not an electron browser
-window.open = function (url, target) {
-    if (target === '_blank') {
-        shell.openExternal(url);
-    }
-};
-// Register "base" page view
-// analytics.pageview('/');
-
-const appTarget = document.getElementById('app');
-appTarget.className = styles.app || 'app'; // TODO
-document.body.appendChild(appTarget);
-
-GUI.setAppElement(appTarget);
-const WrappedGui = AppStateHOC(GUI);
-
-const onStorageInit = storageInstance => {
-    storageInstance.addHelper(new ElectronStorageHelper(storageInstance));
-    // storageInstance.addOfficialScratchWebStores(); // TODO: do we want this?
-};
-
-const guiProps = {
-    onStorageInit,
-    isScratchDesktop: true,
-    projectId: defaultProjectId,
-    showTelemetryModal: (typeof ipcRenderer.sendSync('getTelemetryDidOptIn')) !== 'boolean',
-    onTelemetryModalOptIn: () => {
-        ipcRenderer.send('setTelemetryDidOptIn', true);
-    },
-    onTelemetryModalOptOut: () => {
-        ipcRenderer.send('setTelemetryDidOptIn', false);
-    },
-    onProjectTelemetryEvent: (event, metadata) => {
-        ipcRenderer.send(event, metadata);
-    }
-};
-const wrappedGui = React.createElement(WrappedGui, guiProps);
-ReactDOM.render(wrappedGui, appTarget);
+routeModulePromise.then(routeModule => {
+    const appTarget = document.getElementById('app');
+    const routeElement = routeModule.default;
+    ReactDOM.render(routeElement, appTarget);
+});
