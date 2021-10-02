@@ -18,7 +18,8 @@
     "build:dist": "npm run compile && npm run doBuild -- --mode=dist",
     "doBuild": "node ./scripts/electron-builder-wrapper.js",
     "dist": "npm run clean && npm run compile && npm run fetch && npm run doBuild -- --mode=dist",
-    "dist-win": "npm run fetch && npm run compile -p && electron-builder --windows nsis:ia32",
+    "dist-win": "npm run fetch && npm run compile -p && electron-builder --windows -c electron-builder.yaml nsis",
+    "dist-win32": "npm run fetch && npm run compile -p && electron-builder -c electron-builder.yaml --windows nsis:ia32",
     "distDev": "npm run clean && npm run compile && npm run fetch && npm run doBuild -- --mode=dev",
     "test": "npm run test:lint",
     "test:lint": "eslint --cache --color --ext .jsx,.js ."
