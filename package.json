@@ -20,6 +20,7 @@
     "dist": "npm run clean && npm run compile && npm run fetch && npm run doBuild -- --mode=dist",
     "dist-win": "npm run fetch && npm run compile -p && electron-builder --windows -c electron-builder.yaml nsis",
     "dist-win32": "npm run fetch && npm run compile -p && electron-builder -c electron-builder.yaml --windows nsis:ia32",
+    "dist-m1": "npm run fetch && npm run compile -p && electron-builder -c electron-builder.yaml --dir --mac --universal -c.mac.identity=null",
     "distDev": "npm run clean && npm run compile && npm run fetch && npm run doBuild -- --mode=dev",
     "test": "npm run test:lint",
     "test:lint": "eslint --cache --color --ext .jsx,.js ."
@@ -29,7 +30,12 @@
     "url": "git+ssh://git@github.com/LLK/scratch-desktop.git"
   },
   "dependencies": {
-    "source-map-support": "^0.5.19"
+    "autoprefixer": "^9.8.8",
+    "postcss": "^8.4.16",
+    "postcss-import": "^12.0.1",
+    "postcss-simple-vars": "^5.0.2",
+    "source-map-support": "^0.5.19",
+    "tailwindcss": "^3.1.8"
   },
   "devDependencies": {
     "@babel/core": "^7.9.6",
