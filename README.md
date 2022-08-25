@@ -4,26 +4,43 @@ Scratch 3.0 as a standalone desktop application
 
 ## Developer Instructions
 
-### Prepare `scratch-gui`
+### Releasing a new version
 
-This step is temporary: eventually, the `scratch-desktop` branch of the Scratch GUI repository will be merged with
-that repository's main development line. For now, though, there's a separate branch:
+Let's assume that you want to make a new release, version `3.999.0`, corresponding to `scratch-gui` version
+`0.1.0-prerelease.20yymmdd`.
 
-1. Clone the `scratch-gui` repository if you haven't already.
-2. Switch to the `scratch-desktop` branch with `git checkout scratch-desktop`
-3. Build with `BUILD_MODE=dist` and `STATIC_PATH=static`:
-   - macOS, WSL, or Cygwin: run `BUILD_MODE=dist STATIC_PATH=static npm run build` or
-     `BUILD_MODE=dist STATIC_PATH=static npm run watch`
-     - Running `npm run build-gui` in `scratch-desktop` is a shortcut for this when using `npm link`.
-   - CMD: run `set BUILD_MODE=dist` once and `set STATIC_PATH=static` once, then `npm run build` or `npm run watch`
-     any number of times in the same
-     window.
-   - PowerShell: run `$env:BUILD_MODE = "dist"` once and `$env:STATIC_PATH = "static"` once, then `npm run build` or
-     `npm run watch` any number of times in the same window.
+1. Merge `scratch-gui`:
+   1. `cd scratch-gui`
+   2. `git pull --all --tags`
+   3. `git checkout scratch-desktop`
+   4. `git merge 0.1.0-prerelease.20yymmdd`
+   5. Resolve conflicts if necessary
+   6. `git tag scratch-desktop-v3.999.0`
+   7. `git push`
+   8. `git push --tags`
+2. Prep `scratch-desktop`:
+   1. `cd scratch-desktop`
+   2. `git pull --all --tags`
+   3. `git checkout develop`
+   4. `npm install --save-dev 'scratch-gui@github:LLK/scratch-gui#scratch-desktop-v3.999.0'`
+   5. `git add package.json package-lock.json`
+   6. Make sure the app works, the diffs look reasonable, etc.
+   7. `git commit -m "bump scratch-gui to scratch-desktop-v3.999.0"`
+   8. `npm version 3.999.0`
+   9. `git push`
+   10. `git push --tags`
+3. Wait for the CI build and collect the release from the build artifacts
 
-If you have run `npm link scratch-gui` (or equivalent) in the `scratch-desktop` working directory, you may be able to
-accomplish the above by running `npm run build-gui` in the `scratch-desktop` directory instead of using the manual
-steps listed above.
+### A note about `scratch-gui`
+
+Eventually, the `scratch-desktop` branch of the Scratch GUI repository will be merged with that repository's main
+development line. For now, though, the `scratch-desktop` branch holds a few changes that are necessary for the Scratch
+app to function correctly but are not yet merged into the main development branch. If you only intend to build or work
+on the `scratch-desktop` repository then you can ignore this, but if you intend to work on `scratch-gui` as well, make
+sure you use the `scratch-desktop` branch there.
+
+Previously it was necessary to explicitly build `scratch-gui` before building `scratch-desktop`. This is no longer
+necessary and the related build scripts, such as `build-gui`, have been removed.
 
 ### Prepare media library assets
 
@@ -59,6 +76,20 @@ To generate a signed NSIS installer:
    - PowerShell: `$env:WIN_CSC_KEY_PASSWORD = "superSecret"`
 4. Build the NSIS installer only: building the APPX installer will fail if these environment variables are set.
    - `npm run dist -- -w nsis`
+
+#### Workaround for code signing issue in macOS
+
+Sometimes the macOS build process will result in a build which crashes on startup. If this happens, check in `Console`
+for an entry similar to this:
+
+```text
+failed to parse entitlements for Scratch[12345]: OSUnserializeXML: syntax error near line 1
+```
+
+This appears to be an issue with `codesign` itself. Rebooting your computer and trying to build again might help. Yes,
+really.
+
+See this issue for more detail: <https://github.com/electron/electron-osx-sign/issues/218>
 
 ### Make a semi-packaged build
 
@@ -100,3 +131,27 @@ configuration like this:
         ]
     },
 ```
+
+### Resetting the Telemetry System
+
+This application includes a telemetry system which is only active if the user opts in. When testing this system, it's
+sometimes helpful to reset it by deleting the `telemetry.json` file.
+
+The location of this file depends on your operating system and whether or not you're running a packaged build. Running
+from `npm start` or equivalent is a non-packaged build.
+
+In addition, macOS may store the file in one of two places depending on the OS version and a few other variables. If
+in doubt, I recommend removing both.
+
+- Windows, packaged build: `%APPDATA%\Scratch\telemetry.json`
+- Windows, non-packaged: `%APPDATA%\Electron\telemetry.json`
+- macOS, packaged build: `~/Library/Application Support/Scratch/telemetry.json` or
+  `~/Library/Containers/edu.mit.scratch.scratch-desktop/Data/Library/Application Support/Scratch/telemetry.json`
+- macOS, non-packaged build: `~/Library/Application Support/Electron/telemetry.json` or
+  `~/Library/Containers/edu.mit.scratch.scratch-desktop/Data/Library/Application Support/Electron/telemetry.json`
+
+Deleting this file will:
+
+- Remove any pending telemetry packets
+- Reset the opt in/out state: the app should display the opt in/out modal on next launch
+- Remove the random client UUID: the app will generate a new one on next launch

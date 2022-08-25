@@ -17,7 +17,7 @@ npm-*
 /build
 /dist
 /.opt-in
-/embedded.provisionprofile
+/*.provisionprofile
 
 # don't store the assets downloaded with the `fetch` script
 /static/assets/
@@ -25,3 +25,10 @@ npm-*
 # generated translation files
 /translations
 /locale
+
+# Fastlane
+**/fastlane/Matchfile
+**/fastlane/report.xml
+**/fastlane/Preview.html
+**/fastlane/screenshots
+**/fastlane/test_output
