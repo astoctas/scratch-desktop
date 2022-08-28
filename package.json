@@ -14,6 +14,7 @@
     "build:dev": "npm run compile && npm run doBuild -- --mode=dev",
     "build:dir": "npm run compile && npm run doBuild -- --mode=dir",
     "build:dist": "npm run compile && npm run doBuild -- --mode=dist",
+    "build:m1": "electron-builder -c electron-builder.yaml --dir --mac --universal -c.mac.identity=null",
     "doBuild": "node ./scripts/electron-builder-wrapper.js",
     "dist": "npm run clean && npm run compile && npm run fetch && npm run doBuild -- --mode=dist",
     "dist-win": "npm run fetch && npm run compile -p && electron-builder --windows -c electron-builder.yaml nsis",
