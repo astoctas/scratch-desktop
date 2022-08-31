@@ -67,7 +67,7 @@
     "react-redux": "5.0.7",
     "redux": "3.7.2",
     "rimraf": "^3.0.2",
-    "scratch-gui": "github:astoctas/scratch-gui#dev-interfaz",
+    "scratch-gui": "github:astoctas/scratch-gui#develop-interfaz",
     "uuid": "^8.0.0",
     "webpack": "^4.43.0"
   },
