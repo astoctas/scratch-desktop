@@ -15,6 +15,9 @@
     "build:dir": "npm run compile && npm run doBuild -- --mode=dir",
     "build:dist": "npm run compile && npm run doBuild -- --mode=dist",
     "doBuild": "node ./scripts/electron-builder-wrapper.js",
+    "dist-win": "npm run fetch && npm run compile -p && electron-builder --windows -c electron-builder.yaml ",
+    "dist-win32": "npm run fetch && npm run compile -p && electron-builder -c electron-builder.yaml --windows nsis:ia32",
+    "dist-m1": "npm run fetch && npm run compile -p && electron-builder -c electron-builder.yaml --dir --mac --universal -c.mac.identity=null",    
     "dist": "npm run clean && npm run compile && npm run fetch && npm run doBuild -- --mode=dist",
     "distDev": "npm run clean && npm run compile && npm run fetch && npm run doBuild -- --mode=dev",
     "test": "npm run test:lint",
@@ -22,7 +25,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/LLK/scratch-desktop.git"
+    "url": "git+ssh://git@github.com/astoctas/scratch-desktop.git"
   },
   "dependencies": {
     "source-map-support": "^0.5.19"
@@ -64,7 +67,7 @@
     "react-redux": "5.0.7",
     "redux": "3.7.2",
     "rimraf": "^3.0.2",
-    "scratch-gui": "github:LLK/scratch-gui#scratch-desktop-v3.29.0",
+    "scratch-gui": "github:astoctas/scratch-gui#dev-interfaz-0.5",
     "uuid": "^8.0.0",
     "webpack": "^4.43.0"
   },
